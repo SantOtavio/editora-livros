@@ -66,7 +66,7 @@ public class PessoaController {
         service.delete(entity);
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/buscar/email/{email}")
     public ResponseEntity<Object> findByEmail(@PathVariable(value = "email") String email) {
         Optional<Pessoa> pessoaOptional = service.findByEmail(email);
 
@@ -77,9 +77,26 @@ public class PessoaController {
         return ResponseEntity.status(HttpStatus.OK).body(pessoaOptional.get());
     }
 
+    @PutMapping("/{cpf}")
+    public ResponseEntity<Object> update(@PathVariable(value = "cpf") Long cpf, @RequestBody @Valid PessoaDTO pessoaDTO) {
+        Optional<Pessoa> pessoaOptional = service.findById(cpf);
+        if (pessoaOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrado pessoa com o cpf " + cpf);
+        }
+
+        if (service.existsByEmail(pessoaDTO.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Já existe uma pessoa cadastrada com o email informado");
+        }
+
+        Pessoa pessoa = pessoaOptional.get();
+        BeanUtils.copyProperties(pessoaDTO, pessoa);
+        service.save(pessoa);
+        return ResponseEntity.status(HttpStatus.OK).body(pessoa);
+    }
+
     @PostMapping
     public ResponseEntity<Object> save(@RequestBody @Valid PessoaDTO pessoaDTO) {
-
+        System.out.println(pessoaDTO);
         if(service.existsById(pessoaDTO.getCpf())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe uma pessoa cadastrada com o cpf informado");
         }
@@ -87,9 +104,11 @@ public class PessoaController {
         if (service.existsByEmail(pessoaDTO.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe uma pessoa cadastrada com o email informado");
         }
+        System.out.println("Depois do findByEmail");
 
-        Pessoa pessoa;
-        BeanUtils.copyProperties(pessoaDTO, pessoa = new Pessoa());
+        Pessoa pessoa = new Pessoa();
+        BeanUtils.copyProperties(pessoaDTO, pessoa);
+        service.save(pessoa);
         return ResponseEntity.status(HttpStatus.CREATED).body(pessoa);
     }
 }
