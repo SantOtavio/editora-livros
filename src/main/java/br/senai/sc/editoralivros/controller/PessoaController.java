@@ -1,12 +1,14 @@
 package br.senai.sc.editoralivros.controller;
 
 import br.senai.sc.editoralivros.DTO.PessoaDTO;
+import br.senai.sc.editoralivros.factory.PessoaFactory;
 import br.senai.sc.editoralivros.model.entities.Pessoa;
 import br.senai.sc.editoralivros.model.service.PessoaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,9 +108,12 @@ public class PessoaController {
         }
         System.out.println("Depois do findByEmail");
 
-        Pessoa pessoa = new Pessoa();
-        BeanUtils.copyProperties(pessoaDTO, pessoa);
-        service.save(pessoa);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pessoa);
+        Pessoa pessoa;
+        PessoaFactory pessoaFactory = new PessoaFactory();
+        BeanUtils.copyProperties(pessoaDTO, pessoa = pessoaFactory.getPessoa(pessoaDTO.getTipo()));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        pessoa.setSenha(encoder.encode(pessoaDTO.getSenha()));
+        Pessoa pessoaSalva = service.save(pessoa);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
     }
 }
