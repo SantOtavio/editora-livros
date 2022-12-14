@@ -32,7 +32,7 @@ import java.util.Optional;
 public class LivroController {
     LivroService service;
 
-    @PostMapping("/livro")
+    @PostMapping("/post/livro")
     public ResponseEntity<Object> save(
             @RequestParam("livro") String livroIsbn,
             @RequestParam("arquivo") MultipartFile file

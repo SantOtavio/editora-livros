@@ -1,4 +1,4 @@
-package br.senai.sc.editoralivros.security;
+package br.senai.sc.editoralivros.security.DTO;
 
 import lombok.Data;
 
