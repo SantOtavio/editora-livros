@@ -59,30 +59,8 @@ public class AutenticacaoConfig {
                 .and().csrf().disable()
                 .cors().disable()
                 .formLogin().permitAll()
-//                .and()
-//                .oauth2Login().userInfoEndpoint().userService(googleService)
-//                .and()
-//                .loginPage("/editoraLivros/login")
-//                .successHandler(new AuthenticationSuccessHandler() {
-//                    @Override
-//                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-//                        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-//                        System.out.println(oAuth2User);
-//                        try {
-//                            UserDetails userDetails = jpaService.loadUserByUsername(oAuth2User.getAttribute("email"));
-//                            response.sendRedirect("/editoraLivros/home");
-//                        } catch (UsernameNotFoundException e) {
-//                            response.sendRedirect("/editoraLivros/usuarios");
-//                        }
-//                    }
-//                })
                 .and()
                 .logout().permitAll();
-//                    .logoutUrl("/editoraLivros/logout")
-//                    .logoutSuccessUrl("/editoraLivros/login").permitAll();
-//                .and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and().addFilterBefore(new AutenticacaoFiltro(jpaService), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 }
