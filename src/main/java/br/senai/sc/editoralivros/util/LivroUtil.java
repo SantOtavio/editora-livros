@@ -8,8 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fit.pdfdom.PDFDomTree;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,4 +39,19 @@ public class LivroUtil {
     private Livro convertDtoToModel(@Valid LivroDTO livroDTO){
         return this.objectMapper.convertValue(livroDTO, Livro.class);
     }
+
+    private static void generateHTMLFromPDF(String filename) throws IOException {
+        PDDocument pdf = PDDocument.load(new File(filename));
+        Writer output = new PrintWriter("src/output/pdf.html", "utf-8");
+        new PDFDomTree().writeText(pdf, output);
+
+        output.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        generateHTMLFromPDF("src/output/pdf.pdf");
+
+    }
+
 }

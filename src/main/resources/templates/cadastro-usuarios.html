@@ -28,23 +28,19 @@
             <input type="email" id="email" class="form-control" th:field="*{email}"/>
         </div>
         <div class="mb-3">
-            <div class="ms-2 form-label fw-semibold">Usuário</div>
-            <input type="text" id="usuario" class="form-control"/>
-        </div>
-        <div class="mb-3">
             <div class="ms-2 form-label fw-semibold">CPF</div>
-            <input type="text" id="cpf" class="form-control"/>
+            <input type="text" id="cpf" class="form-control" th:field="*{cpf}"/>
         </div>
         <div class="mb-3">
             <div class="ms-2 form-label fw-semibold">Gênero</div>
-            <select id="genero" class="form-control">
+            <select id="genero" class="form-control" name="genero">
                 <option disabled selected>Selecione um gênero</option>
-                <option th:each="genero:${T(br.senai.sc.editoralivros.model.entities.Genero.values()}" th:text="${genero.nome}">Genero</option>
+                <option th:each="genero:${T(br.senai.sc.editoralivros.model.entities.Genero).values()}" th:value="${genero.name}" th:text="${genero.nome}">Genero</option>
             </select>
         </div>
         <div class="mb-3">
             <div class="ms-2 form-label fw-semibold">Senha</div>
-            <input type="password" id="senha" class="form-control"/>
+            <input type="password" id="senha" class="form-control" th:field="*{senha}"/>
         </div>
         <div class="mb-3">
             <div class="ms-2 form-label fw-semibold">Confirmar senha</div>

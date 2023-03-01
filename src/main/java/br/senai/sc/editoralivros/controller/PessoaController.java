@@ -111,8 +111,8 @@ public class PessoaController {
         Pessoa pessoa;
         PessoaFactory pessoaFactory = new PessoaFactory();
         BeanUtils.copyProperties(pessoaDTO, pessoa = pessoaFactory.getPessoa(pessoaDTO.getTipo()));
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        pessoa.setSenha(encoder.encode(pessoaDTO.getSenha()));
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        pessoa.setSenha(encoder.encode(pessoaDTO.getSenha()));
         Pessoa pessoaSalva = service.save(pessoa);
         return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
     }
