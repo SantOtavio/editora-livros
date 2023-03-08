@@ -1,8 +1,10 @@
 package br.senai.sc.editoralivros.security.configuration;
 
 import br.senai.sc.editoralivros.security.AutenticacaoFiltro;
+import br.senai.sc.editoralivros.security.TokenUtils;
 import br.senai.sc.editoralivros.security.service.GoogleService;
 import br.senai.sc.editoralivros.security.service.JpaService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -31,6 +34,7 @@ import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class AutenticacaoConfig {
 
     @Autowired
@@ -39,17 +43,14 @@ public class AutenticacaoConfig {
     @Autowired
     private GoogleService googleService;
 
+    @Autowired
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(jpaService).passwordEncoder(NoOpPasswordEncoder.getInstance());
+    }
+
     //Configura as autorizações de acesso
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(jpaService);
-        authenticationProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
-
-
-        httpSecurity.authenticationProvider(authenticationProvider);
-
         httpSecurity
                 .authorizeRequests()
                 //Libera o acesso sem autenticação no /login
@@ -61,6 +62,15 @@ public class AutenticacaoConfig {
                 .formLogin().permitAll()
                 .and()
                 .logout().permitAll();
+        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.addFilterBefore(new AutenticacaoFiltro(new TokenUtils(), jpaService), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
+    }
+
+
+    //Este método é necessário para que o AuthenticationManager seja injetado no AutenticacaoController
+    @Bean
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration ac) throws Exception {
+        return ac.getAuthenticationManager();
     }
 }

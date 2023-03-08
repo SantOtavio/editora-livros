@@ -32,7 +32,5 @@ public class UserJPA implements UserDetails {
     }
 
     @Override
-        public String getUsername() {
-        return pessoa.getEmail();
-    }
+        public String getUsername() {return pessoa.getEmail();}
 }
