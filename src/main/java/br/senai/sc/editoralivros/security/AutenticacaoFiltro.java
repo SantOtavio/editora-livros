@@ -25,24 +25,31 @@ public class AutenticacaoFiltro extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        } else {
-            token = null;
+        if (request.getRequestURI().equals("/editoraLivros/login") || request.getRequestURI().equals("/editoraLivros/login/auth") || request.getRequestURI().equals("/logout")) {
+            filterChain.doFilter(request, response);
+            System.out.println("entrou no filtro errado");
+            return;
         }
+//        String token = request.getHeader("Authorization");
+//        if (token != null && token.startsWith("Bearer ")) {
+//            token = token.substring(7);
+//        } else {
+//            token = null;
+//        }
+        System.out.println("entrou no filtro");
+        String token = tokenUtils.buscarCookie(request);
+        System.out.println("buscou cookie");
         Boolean valido = tokenUtils.validaToken(token);
         if (valido) {
             System.out.println("Token válido!");
             Long usuarioCPF = tokenUtils.getUsuarioCPF(token);
-            UserDetails usuario = jpaService.loadUserByUsername(usuarioCPF.toString());
+            UserDetails usuario = jpaService.loadUserByCPF(usuarioCPF);
+            System.out.println(usuario);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario.getUsername(), null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else if (!request.getRequestURI().contains("login")) {
-            System.out.println("Token inválido!");
-            response.setStatus(401);
+            filterChain.doFilter(request, response);
+            return;
         }
-
-        filterChain.doFilter(request, response);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
     }
 }

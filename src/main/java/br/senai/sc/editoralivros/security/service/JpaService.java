@@ -33,8 +33,13 @@ public class JpaService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("Username: " + username);
-        Optional<Pessoa> pessoaOptional = pessoaRepository.findByEmail(username);
+        Optional<Pessoa> pessoaOptional;
+        try {
+            Long cpf = Long.parseLong(username);
+            pessoaOptional = pessoaRepository.findById(cpf);
+        } catch (NumberFormatException e) {
+            pessoaOptional = pessoaRepository.findByEmail(username);
+        }
         if (pessoaOptional.isPresent()) {
             System.out.println("Pessoa encontrada");
             return new UserJPA(pessoaOptional.get());
@@ -44,6 +49,18 @@ public class JpaService implements UserDetailsService {
                 System.out.println("Pessoa encontrada");
                 return new UserJPA(pessoaOptional.get());
             }
+        }
+        System.out.println("Pessoa não encontrada");
+        throw new UsernameNotFoundException("Usuário não encontrado");
+    }
+
+    public UserDetails loadUserByCPF(Long cpf) throws UsernameNotFoundException {
+        System.out.println("cpf: " + cpf);
+        Optional<Pessoa> pessoaOptional = pessoaRepository.findById(cpf);
+        if (pessoaOptional.isPresent()) {
+            UserJPA userJPA = new UserJPA(pessoaOptional.get());
+            System.out.println(userJPA);
+            return userJPA;
         }
         System.out.println("Pessoa não encontrada");
         throw new UsernameNotFoundException("Usuário não encontrado");

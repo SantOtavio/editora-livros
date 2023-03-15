@@ -54,7 +54,8 @@ public class AutenticacaoConfig {
         httpSecurity
                 .authorizeRequests()
                 //Libera o acesso sem autenticação no /login
-                .antMatchers("/editoraLivros/login", "/editoraLivros/usuarios", "/editoraLivros/pessoa").permitAll()
+                .antMatchers("/editoraLivros/login", "/editoraLivros/login/auth", "/editoraLivros/logout", "/editoraLivros/pessoa" ).permitAll()
+                .antMatchers(HttpMethod.POST, "/editoraLivros/post/livro").hasAuthority("Autor")
                 //Determina que todas as demais requisições terão que ser autenticadas
                 .anyRequest().authenticated()
                 .and().csrf().disable()
